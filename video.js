@@ -1,6 +1,4 @@
-// netlify/functions/generate-video/generate-video.js
-// Replicate API - Text to Video (Stable Video Diffusion)
-
+// Replicate API - Text to Video
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { 
@@ -43,7 +41,6 @@ exports.handler = async (event) => {
       };
     }
 
-    // Style prompts
     const stylePrompts = {
       "Cinematic": "cinematic, 4K, film grain, dramatic lighting, professional cinematography, smooth motion",
       "Anime": "anime style, vibrant colors, Japanese animation, Studio Ghibli inspired, smooth animation",
@@ -54,11 +51,9 @@ exports.handler = async (event) => {
 
     const enhancedPrompt = `${prompt}, ${stylePrompts[style] || stylePrompts["Cinematic"]}`;
 
-    // ✅ Correct Stable Video Diffusion model on Replicate
-    // Using the correct version for SVD
+    // Stable Video Diffusion model
     const modelVersion = "stability-ai/stable-video-diffusion:3f0457e4619daac51203dedb472816fd4af51f3149fa7a9e0b5ffcf1b8172438";
 
-    // Create prediction
     const createResponse = await fetch("https://api.replicate.com/v1/predictions", {
       method: "POST",
       headers: {
@@ -109,82 +104,6 @@ exports.handler = async (event) => {
       statusCode: 500,
       headers,
       body: JSON.stringify({ error: "Server error: " + err.message }),
-
-      // netlify/functions/check-video/check-video.js
-// Replicate prediction status checker
-
-exports.handler = async (event) => {
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Content-Type": "application/json",
-  };
-
-  if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 200, headers, body: "" };
-  }
-
-  try {
-    const { prediction_id } = JSON.parse(event.body || "{}");
-
-    if (!prediction_id) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: "prediction_id chahincha" }),
-      };
-    }
-
-    const apiKey = process.env.REPLICATE_API_TOKEN;
-    if (!apiKey) {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: "REPLICATE_API_TOKEN configure bhayeko chaina." }),
-      };
-    }
-
-    const response = await fetch(
-      `https://api.replicate.com/v1/predictions/${prediction_id}`,
-      {
-        headers: { Authorization: `Token ${apiKey}` },
-      }
-    );
-
-    const data = await response.json();
-
-    let videoUrl = null;
-    if (data.status === 'succeeded' && data.output) {
-      // Replicate SVD output is usually a URL
-      if (typeof data.output === 'string') {
-        videoUrl = data.output;
-      } else if (Array.isArray(data.output) && data.output.length > 0) {
-        videoUrl = data.output[0];
-      } else if (data.output?.url) {
-        videoUrl = data.output.url;
-      }
-    }
-
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        status: data.status,
-        video_url: videoUrl,
-        error: data.error || null,
-        progress: data.logs || null,
-      }),
-    };
-
-  } catch (err) {
-    console.error('Check video error:', err);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: err.message }),
-    };
-  }
-};
     };
   }
 };
