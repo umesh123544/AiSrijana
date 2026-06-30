@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AiSirjana — AI Photo & Video Generator Nepal</title>
+<meta name="description" content="Nepal ko pehilo AI Photo ra Video Generator. Free ma suru garnus, HD quality photo ra video banaaunus seconds ma.">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --purple: #7C3AED;
+    --purple-dark: #5B21B6;
+    --purple-mid: #A855F7;
+    --purple-light: #EDE9FE;
+    --pink: #EC4899;
+    --gold: #F59E0B;
+    --gold-dark: #D97706;
+    --bg-deep: #06040f;
+    --bg-dark: #0d0b1a;
+    --bg-card: rgba(255,255,255,0.04);
+    --bg-card-hover: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.08);
+    --border-purple: rgba(124,58,237,0.35);
+    --text-primary: #F9FAFB;
+    --text-secondary: #9CA3AF;
+    --text-muted: #4B5563;
+    --radius: 14px;
+    --radius-lg: 20px;
+    --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── GRID BACKGROUND ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,58,237,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,58,237,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body > * { position: relative; z-index: 1; }
+
+  /* ─── NAVBAR ─── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    background: rgba(6,4,15,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-purple);
+    padding: 0 clamp(16px, 4vw, 40px);
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .logo-mark {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--purple), var(--purple-mid));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .logo-text {
+    background: linear-gradient(135deg, #C4B5FD, #F9A8D4, #FCD34D);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .nav-center {
+    display: flex;
+    gap: 4px;
+  }
+
+  .nav-link {
+    padding: 7px 16px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+  }
+
+  .nav-link:hover { color: var(--text-primary); background: rgba(255,255,255,0.06); }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .credits-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(245,158,11,0.12);
+    border: 1px solid rgba(245,158,11,0.3);
+    color: #FCD34D;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .btn-nav-upgrade {
+    background: linear-gradient(135deg, var(--purple), var(--purple-mid));
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-nav-upgrade:hover {
+    box-shadow: 0 4px 20px rgba(124,58,237,0.5);
+    transform: translateY(-1px);
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    text-align: center;
+    padding: clamp(50px,8vw,100px) clamp(16px,4vw,40px) clamp(40px,6vw,70px);
+    position: relative;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 800px; height: 600px;
+    background: radial-gradient(ellipse, rgba(124,58,237,0.18) 0%, transparent 65%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(124,58,237,0.12);
+    border: 1px solid rgba(124,58,237,0.35);
+    color: #C4B5FD;
+    padding: 7px 18px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .hero-eyebrow .dot {
+    width: 6px; height: 6px;
+    background: #A855F7;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .hero h1 {
+    font-size: clamp(32px, 6vw, 68px);
+    font-weight: 900;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 .gradient-text {
+    background: linear-gradient(135deg, #A78BFA 0%, #EC4899 50%, #FCD34D 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: clamp(15px, 2vw, 18px);
+    color: var(--text-secondary);
+    max-width: 540px;
+    margin: 0 auto 36px;
+    line-height: 1.65;
+  }
+
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: clamp(24px, 4vw, 60px);
+    margin-top: 48px;
+    flex-wrap: wrap;
+  }
+
+  .stat { text-align: center; }
+  .stat-num {
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 800;
+    background: linear-gradient(135deg, #A78BFA, #EC4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; font-weight: 500; }
+
+  /* ─── TABS ─── */
+  .tabs-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    padding: 5px;
+    border-radius: 40px;
+  }
+
+  .tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 28px;
+    border-radius: 36px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: var(--font);
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--purple), var(--purple-mid));
+    color: white;
+    box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+  }
+
+  .tab-btn:not(.active) {
+    background: transparent;
+    color: var(--text-secondary);
+  }
+
+  .tab-btn:not(.active):hover {
+    color: var(--text-primary);
+    background: rgba(255,255,255,0.06);
+  }
+
+  /* ─── MAIN LAYOUT ─── */
+  .main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 clamp(16px, 4vw, 40px) 100px;
+  }
+
+  /* ─── CREDITS BANNER ─── */
+  .credits-banner {
+    background: rgba(245,158,11,0.06);
+    border: 1px solid rgba(245,158,11,0.18);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .credits-info { flex: 1; min-width: 200px; }
+
+  .credits-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .credits-label span { font-size: 13px; font-weight: 600; color: #FCD34D; }
+  .credits-label small { font-size: 12px; color: var(--text-muted); }
+
+  .progress-track {
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #F59E0B, #EF4444);
+    border-radius: 10px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .credits-note {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  .credits-note strong { color: #F59E0B; }
+
+  .btn-get-more {
+    background: rgba(245,158,11,0.15);
+    border: 1px solid rgba(245,158,11,0.3);
+    color: #FCD34D;
+    padding: 9px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    font-family: var(--font);
+  }
+
+  .btn-get-more:hover { background: rgba(245,158,11,0.25); }
+
+  /* ─── GENERATOR CARD ─── */
+  .gen-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: clamp(20px, 3vw, 32px);
+    margin-bottom: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .gen-card:focus-within { border-color: var(--border-purple); }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .card-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .card-icon.photo-icon { background: rgba(124,58,237,0.2); }
+  .card-icon.video-icon { background: rgba(59,130,246,0.2); }
+
+  .card-title { font-size: 17px; font-weight: 700; }
+  .card-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ─── PROMPT AREA ─── */
+  .prompt-wrap { position: relative; }
+
+  textarea.prompt-input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.65;
+    padding: 16px 18px;
+    resize: vertical;
+    outline: none;
+    min-height: 110px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  textarea.prompt-input::placeholder { color: var(--text-muted); }
+
+  textarea.prompt-input:focus {
+    border-color: rgba(124,58,237,0.5);
+    background: rgba(255,255,255,0.06);
+  }
+
+  .prompt-suggestions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .suggestion-chip {
+    background: rgba(124,58,237,0.1);
+    border: 1px solid rgba(124,58,237,0.2);
+    color: #A78BFA;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--font);
+  }
+
+  .suggestion-chip:hover {
+    background: rgba(124,58,237,0.2);
+    border-color: rgba(124,58,237,0.4);
+  }
+
+  /* ─── OPTIONS GRID ─── */
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .option-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+
+  .option-group select {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 9px 12px;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236B7280'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    transition: border-color 0.2s;
+  }
+
+  .option-group select:focus { border-color: rgba(124,58,237,0.5); }
+  .option-group select option { background: #1a1228; }
+
+  /* ─── NEGATIVE PROMPT ─── */
+  .neg-toggle {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font);
+    transition: color 0.2s;
+    margin-top: 4px;
+  }
+  .neg-toggle:hover { color: var(--text-secondary); }
+  .neg-prompt { display: none; margin-top: 8px; }
+  .neg-prompt.show { display: block; }
+  .neg-prompt textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: var(--radius);
+    color: var(--text-secondary);
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 12px 14px;
+    resize: none;
+    outline: none;
+    min-height: 70px;
+  }
+  .neg-prompt textarea::placeholder { color: var(--text-muted); }
+
+  /* ─── GENERATE BUTTON ─── */
+  .btn-generate {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    background: linear-gradient(135deg, var(--purple), var(--purple-mid));
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 18px;
+    transition: all 0.25s;
+    font-family: var(--font);
+    letter-spacing: 0.01em;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-generate::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .btn-generate:hover::before { opacity: 1; }
+
+  .btn-generate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px rgba(124,58,237,0.45);
+  }
+
+  .btn-generate:active { transform: translateY(0); }
+
+  .btn-generate:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ─── OUTPUT AREA ─── */
+  .output-area {
+    display: none;
+    margin-top: 20px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    text-align: center;
+    animation: fadeUp 0.4s ease;
+  }
+
+  .output-area.visible { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .output-canvas {
+    width: 100%;
+    max-width: 480px;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    margin: 0 auto 16px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+  }
+
+  .output-canvas .noise-overlay {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .output-quality-badge {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .output-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-action {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text-primary);
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--font);
+  }
+
+  .btn-action:hover {
+    background: rgba(255,255,255,0.09);
+    border-color: rgba(255,255,255,0.2);
+  }
+
+  /* ─── VIDEO NOTICE ─── */
+  .plan-notice {
+    background: rgba(59,130,246,0.08);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #93C5FD;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    line-height: 1.5;
+  }
+
+  /* ─── GALLERY ─── */
+  .section-title {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+
+  .section-sub {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+
+  .gallery-item {
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 1;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+
+  .gallery-item:hover {
+    transform: scale(1.04);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  .gallery-item:hover .gallery-overlay { opacity: 1; }
+
+  .gallery-bg {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 42px;
+  }
+
+  .gallery-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(transparent 40%, rgba(0,0,0,0.85));
+    display: flex;
+    align-items: flex-end;
+    padding: 10px;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .gallery-label { font-size: 11px; font-weight: 600; color: white; }
+
+  /* ─── PRICING ─── */
+  .pricing-section { margin-bottom: 60px; }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 16px;
+  }
+
+  .plan-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    position: relative;
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+
+  .plan-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+  }
+
+  .plan-card.featured {
+    border-color: rgba(124,58,237,0.5);
+    background: rgba(124,58,237,0.08);
+  }
+
+  .plan-card.elite {
+    border-color: rgba(217,119,6,0.4);
+    background: rgba(217,119,6,0.06);
+  }
+
+  .popular-badge {
+    position: absolute;
+    top: -1px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--purple), var(--purple-mid));
+    color: white;
+    padding: 5px 20px;
+    border-radius: 0 0 12px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .plan-tier {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .plan-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+    margin-bottom: 4px;
+  }
+
+  .plan-currency { font-size: 18px; color: var(--text-secondary); font-weight: 600; }
+
+  .plan-amount {
+    font-size: 40px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .plan-period { font-size: 13px; color: var(--text-muted); margin-left: 2px; }
+
+  .plan-tagline {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 22px;
+    line-height: 1.5;
+  }
+
+  .plan-divider {
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 20px;
+  }
+
+  .plan-features {
+    list-style: none;
+    margin-bottom: 24px;
+  }
+
+  .plan-features li {
+    font-size: 13px;
+    color: var(--text-secondary);
+    padding: 5px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    line-height: 1.5;
+  }
+
+  .plan-features li .check { color: #A855F7; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .plan-features li.no { color: var(--text-muted); }
+  .plan-features li.no .check { color: var(--text-muted); }
+
+  .btn-plan {
+    width: 100%;
+    padding: 13px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    font-family: var(--font);
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-free {
+    background: rgba(255,255,255,0.05);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+  .btn-free:hover { background: rgba(255,255,255,0.09); }
+
+  .btn-pro {
+    background: linear-gradient(135deg, var(--purple), var(--purple-mid));
+    color: white;
+  }
+  .btn-pro:hover { box-shadow: 0 8px 24px rgba(124,58,237,0.5); transform: translateY(-1px); }
+
+  .btn-elite {
+    background: linear-gradient(135deg, #D97706, #F59E0B);
+    color: white;
+  }
+  .btn-elite:hover { box-shadow: 0 8px 24px rgba(245,158,11,0.4); transform: translateY(-1px); }
+
+  /* ─── FAQ ─── */
+  .faq-section { margin-bottom: 60px; }
+
+  .faq-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .faq-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .faq-q {
+    width: 100%;
+    text-align: left;
+    padding: 16px 20px;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font);
+    transition: background 0.2s;
+  }
+
+  .faq-q:hover { background: rgba(255,255,255,0.03); }
+
+  .faq-arrow { font-size: 16px; color: var(--text-muted); transition: transform 0.25s; flex-shrink: 0; }
+  .faq-item.open .faq-arrow { transform: rotate(180deg); }
+
+  .faq-a {
+    display: none;
+    padding: 0 20px 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    border-top: 1px solid var(--border);
+  }
+  .faq-item.open .faq-a { display: block; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px clamp(16px,4vw,40px);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
+  .footer-links a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--text-secondary); }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: #110e1f;
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: var(--radius-lg);
+    padding: clamp(24px,4vw,36px);
+    max-width: 440px;
+    width: 100%;
+    position: relative;
+    animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.92) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 14px; right: 14px;
+    width: 30px; height: 30px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover { background: rgba(255,255,255,0.12); color: white; }
+
+  .modal h3 { font-size: 22px; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.02em; }
+  .modal-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
+
+  .modal-selected-plan {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(124,58,237,0.1);
+    border: 1px solid rgba(124,58,237,0.25);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-bottom: 20px;
+  }
+
+  .msp-name { font-size: 14px; font-weight: 700; color: #C4B5FD; }
+  .msp-price { font-size: 18px; font-weight: 800; }
+
+  .form-group { margin-bottom: 12px; }
+  .form-group label { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+
+  .modal-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-family: var(--font);
+    font-size: 14px;
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .modal-input:focus { border-color: rgba(124,58,237,0.5); }
+  .modal-input::placeholder { color: var(--text-muted); }
+
+  .payment-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+
+  .payment-methods {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .pm-opt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 12px 6px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--font);
+  }
+
+  .pm-opt:hover { background: rgba(255,255,255,0.07); }
+
+  .pm-opt.selected {
+    border-color: rgba(124,58,237,0.5);
+    background: rgba(124,58,237,0.12);
+  }
+
+  .pm-opt .pm-icon { font-size: 22px; }
+  .pm-opt .pm-name { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
+  .pm-opt.selected .pm-name { color: #C4B5FD; }
+
+  .btn-pay-now {
+    width: 100%;
+    background: linear-gradient(135deg, var(--purple), var(--purple-mid));
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--font);
+    transition: all 0.25s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+
+  .btn-pay-now:hover { box-shadow: 0 8px 28px rgba(124,58,237,0.5); transform: translateY(-1px); }
+  .btn-pay-now:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .secure-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 12px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    padding: 12px 22px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 2000;
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events: none;
+    white-space: nowrap;
+    max-width: 90vw;
+    text-align: center;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { background: #059669; color: white; }
+  .toast.warning { background: #D97706; color: white; }
+  .toast.info { background: var(--purple); color: white; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 640px) {
+    .nav-center { display: none; }
+    .hero-stats { gap: 28px; }
+    .payment-methods { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════ -->
+<nav>
+  <a class="logo" href="#">
+    <div class="logo-mark">✨</div>
+    <span class="logo-text">AiSirjana</span>
+  </a>
+
+  <div class="nav-center">
+    <button class="nav-link" onclick="scrollTo('#generator')">Generator</button>
+    <button class="nav-link" onclick="scrollTo('#gallery')">Gallery</button>
+    <button class="nav-link" onclick="scrollTo('#pricing')">Pricing</button>
+    <button class="nav-link" onclick="scrollTo('#faq')">FAQ</button>
+  </div>
+
+  <div class="nav-right">
+    <div class="credits-pill" id="navCreditsDisplay">⚡ <span id="navCreditsNum">3</span> Credits</div>
+    <button class="btn-nav-upgrade" onclick="openModal('pro')">🚀 Upgrade</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     HERO
+════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-eyebrow">
+    <span class="dot"></span>
+    🇳🇵 Nepal Ko AI Generator — Free Ma Suru Garnus
+  </div>
+
+  <h1>
+    Seconds ma<br>
+    <span class="gradient-text">Photo ra Video</span><br>
+    AI le Banaaucha
+  </h1>
+
+  <p class="hero-sub">
+    Aफ्नो soch Nepali wa English ma lekhnus — AI le professional quality photo ra video banaaucha. Design experience chaindaina.
+  </p>
+
+  <div class="tabs-wrapper" id="generator">
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-photo" onclick="switchTab('photo')">📸 Photo Generate</button>
+      <button class="tab-btn" id="tab-video" onclick="switchTab('video')">🎬 Video Generate</button>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">12,400+</div>
+      <div class="stat-label">Photos Created</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">3,800+</div>
+      <div class="stat-label">Happy Users</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">4.9 ★</div>
+      <div class="stat-label">Rating</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">98%</div>
+      <div class="stat-label">Satisfied</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     MAIN
+════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- CREDITS BANNER -->
+  <div class="credits-banner">
+    <div class="credits-info">
+      <div class="credits-label">
+        <span>⚡ Tapaiko Free Credits</span>
+        <small id="creditCountLabel">3 / 5 baaki</small>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="creditsProgress" style="width:60%"></div>
+      </div>
+      <p class="credits-note">
+        Free ma <strong>5 photo</strong> generate garna milcha. Credits sakiepachi upgrade garnus.
+      </p>
+    </div>
+    <button class="btn-get-more" onclick="openModal('pro')">⚡ Credits Kinu</button>
+  </div>
+
+  <!-- ── PHOTO SECTION ── -->
+  <div id="photoSection">
+    <div class="gen-card">
+      <div class="card-header">
+        <div class="card-icon photo-icon">📸</div>
+        <div>
+          <div class="card-title">Photo Generate Garnus</div>
+          <div class="card-subtitle">Nepali wa English ma prompt lekhnus</div>
+        </div>
+      </div>
+
+      <div class="prompt-wrap">
+        <textarea class="prompt-input" id="photoPrompt" rows="4"
+          placeholder="Lekhnus: 'Everest ko background ma ek yuvati, sunset ko samay, cinematic photography, 8K' wa 'a warrior monk meditating on himalayan peak at dawn, golden hour, hyperrealistic'..."></textarea>
+        <div class="prompt-suggestions">
+          <button class="suggestion-chip" onclick="setPrompt('photo', 'Everest ko hiu ma ek mahila, sunset ko samay, cinematic, 8K')">🏔️ Everest Sunset</button>
+          <button class="suggestion-chip" onclick="setPrompt('photo', 'Kathmandu ko ek gaai, phatik udne, bright colors, artistic')">🐄 Kathmandu Gaai</button>
+          <button class="suggestion-chip" onclick="setPrompt('photo', 'Dragon flying over Himalaya, epic fantasy, 4K ultra realistic')">🐉 Dragon Epic</button>
+          <button class="suggestion-chip" onclick="setPrompt('photo', 'Traditional Nepali woman in red sari, portrait, studio lighting')">👗 Portrait</button>
+        </div>
+      </div>
+
+      <div class="options-grid">
+        <div class="option-group">
+          <label>Style</label>
+          <select id="photoStyle">
+            <option>Realistic (Saccho jasto)</option>
+            <option>Anime / Cartoon</option>
+            <option>Oil Painting</option>
+            <option>3D Render</option>
+            <option>Pencil Sketch</option>
+            <option>Cinematic</option>
+            <option>Watercolor</option>
+            <option>Abstract Art</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label>Aspect Ratio</label>
+          <select id="photoRatio">
+            <option value="1:1">1:1 Square</option>
+            <option value="16:9">16:9 Landscape</option>
+            <option value="9:16">9:16 Portrait</option>
+            <option value="4:3">4:3 Standard</option>
+            <option value="3:2">3:2 Classic</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label>Quality</label>
+          <select id="photoQuality">
+            <option value="standard">Standard (Free)</option>
+            <option value="hd">HD — Pro Plan</option>
+            <option value="4k">4K Ultra — Elite 👑</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label>Lighting</label>
+          <select id="photoLighting">
+            <option>Natural Light</option>
+            <option>Golden Hour</option>
+            <option>Studio Soft</option>
+            <option>Dramatic</option>
+            <option>Neon Night</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="neg-toggle" onclick="toggleNeg('photo')">
+        <span id="negToggleIcon">▸</span> Negative prompt (chahidaina bhanya add garnus)
+      </button>
+      <div class="neg-prompt" id="photoNeg">
+        <textarea rows="2" placeholder="Chahidaina kura: blurry, watermark, low quality, text, logo..."></textarea>
+      </div>
+
+      <button class="btn-generate" id="photoGenBtn" onclick="generatePhoto()">
+        <div class="spinner" id="photoSpinner"></div>
+        <span id="photoBtnTxt">✨ Photo Banaau &nbsp;•&nbsp; 1 Credit</span>
+      </button>
+    </div>
+
+    <!-- PHOTO OUTPUT -->
+    <div class="output-area" id="photoOutput">
+      <div class="output-canvas" id="photoCanvas" style="background:linear-gradient(135deg,#1e1b4b,#4c1d95,#2d1b69)">
+        <span id="photoEmoji">🖼️</span>
+        <div class="noise-overlay"></div>
+        <div class="output-quality-badge" id="photoQualityBadge">Standard</div>
+      </div>
+      <div class="output-actions">
+        <button class="btn-action" onclick="showToast('⬇️ Image download bhayo!','success')">⬇️ Download PNG</button>
+        <button class="btn-action" onclick="showToast('🔗 Share link copy bhayo!','info')">🔗 Share</button>
+        <button class="btn-action" onclick="showToast('🖼️ Gallery ma add bhayo!','success')">📌 Gallery ma Rakh</button>
+        <button class="btn-action" onclick="generatePhoto()">🔄 Aru Try Garnus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VIDEO SECTION ── -->
+  <div id="videoSection" style="display:none">
+    <div class="plan-notice">
+      🎬 <span><strong>Full video generation</strong> Pro ra Elite plan ma available cha. Free users lai <strong>3-second preview</strong> milcha.</span>
+    </div>
+
+    <div class="gen-card">
+      <div class="card-header">
+        <div class="card-icon video-icon">🎬</div>
+        <div>
+          <div class="card-title">Video Generate Garnus</div>
+          <div class="card-subtitle">Text bata AI le video banaucha</div>
+        </div>
+      </div>
+
+      <div class="prompt-wrap">
+        <textarea class="prompt-input" id="videoPrompt" rows="4"
+          placeholder="Lekhnus: 'Kathmandu ko sadak ma manche hiddai cha, rain, slow motion, cinematic' wa 'a golden eagle soaring over snowy Himalayas, aerial shot, sunrise, 4K'..."></textarea>
+        <div class="prompt-suggestions">
+          <button class="suggestion-chip" onclick="setPrompt('video', 'Kathmandu ko sadak ma rain ma manche hiddai, slow motion, cinematic')">🌧️ Rainy Kathmandu</button>
+          <button class="suggestion-chip" onclick="setPrompt('video', 'A dragon soaring over Himalaya, epic, 4K')">🐉 Dragon Flying</button>
+          <button class="suggestion-chip" onclick="setPrompt('video', 'Peaceful rice field timelapse, Nepal village, golden hour')">🌾 Rice Field</button>
+        </div>
+      </div>
+
+      <div class="options-grid">
+        <div class="option-group">
+          <label>Duration</label>
+          <select id="videoDuration">
+            <option value="3">3 sec — Free Preview</option>
+            <option value="5">5 sec — Pro</option>
+            <option value="10">10 sec — Pro</option>
+            <option value="30">30 sec — Elite 👑</option>
+            <option value="60">1 min — Elite 👑</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label>Style</label>
+          <select id="videoStyle">
+            <option>Cinematic</option>
+            <option>Anime</option>
+            <option>Realistic</option>
+            <option>Time-lapse</option>
+            <option>Slow Motion</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label>Resolution</label>
+          <select id="videoRes">
+            <option>480p — Free</option>
+            <option>720p — Pro</option>
+            <option>1080p — Pro</option>
+            <option>4K — Elite 👑</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label>Motion</label>
+          <select id="videoMotion">
+            <option>Auto</option>
+            <option>Slow (0.5x)</option>
+            <option>Normal (1x)</option>
+            <option>Fast (2x)</option>
+            <option>Zoom In</option>
+            <option>Pan Left</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-generate" onclick="generateVideo()" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6)">
+        <span>🎬 Video Banaau &nbsp;•&nbsp; 3 Credits</span>
+      </button>
+    </div>
+
+    <!-- VIDEO OUTPUT -->
+    <div class="output-area" id="videoOutput">
+      <div class="output-canvas" style="background:linear-gradient(135deg,#0c1445,#1e3a8a,#1e1b4b); border-radius:12px">
+        <span style="font-size:64px">🎬</span>
+        <div class="noise-overlay"></div>
+        <div class="output-quality-badge">3 sec Preview</div>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Free preview ready — Full video ko lagi Pro plan upgrade garnus</p>
+      <div class="output-actions">
+        <button class="btn-action" onclick="showToast('⬇️ Preview download bhayo!','success')">⬇️ Preview Download</button>
+        <button class="btn-action" onclick="openModal('pro')">🚀 Full Video Unlock</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── GALLERY ── -->
+  <div id="gallery" style="padding-top:16px">
+    <div class="section-title">✨ Community Gallery</div>
+    <div class="section-sub">AiSirjana users le banaako best creations</div>
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+
+  <!-- ── PRICING ── -->
+  <div class="pricing-section" id="pricing">
+    <div class="section-title" style="text-align:center">Aफ्nो Plan Chhannus</div>
+    <div class="section-sub" style="text-align:center">Free ma suru garnus, upgrade garnus jab chahiyo</div>
+
+    <div class="pricing-grid">
+
+      <!-- FREE -->
+      <div class="plan-card">
+        <div class="plan-tier">Free</div>
+        <div class="plan-price-row">
+          <span class="plan-currency">रु</span>
+          <span class="plan-amount">0</span>
+          <span class="plan-period">/mahina</span>
+        </div>
+        <div class="plan-tagline">Suru garnus, test garnus</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> 5 Photo credits/mahina</li>
+          <li><span class="check">✓</span> Standard quality</li>
+          <li><span class="check">✓</span> 3 sec video preview</li>
+          <li><span class="check">✓</span> Basic styles</li>
+          <li class="no"><span class="check">✕</span> HD / 4K quality</li>
+          <li class="no"><span class="check">✕</span> Full length video</li>
+          <li class="no"><span class="check">✕</span> Watermark remove</li>
+          <li class="no"><span class="check">✕</span> Commercial use</li>
+        </ul>
+        <button class="btn-plan btn-free">Continue Free</button>
+      </div>
+
+      <!-- PRO -->
+      <div class="plan-card featured">
+        <div class="popular-badge">⭐ MOST POPULAR</div>
+        <div class="plan-tier" style="margin-top:16px;color:#A78BFA">Pro</div>
+        <div class="plan-price-row">
+          <span class="plan-currency">रु</span>
+          <span class="plan-amount" style="background:linear-gradient(135deg,#A78BFA,#EC4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">799</span>
+          <span class="plan-period">/mahina</span>
+        </div>
+        <div class="plan-tagline">Creators ra freelancers ko lagi perfect</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> 200 Photo credits/mahina</li>
+          <li><span class="check">✓</span> HD quality photo</li>
+          <li><span class="check">✓</span> 30 sec full video</li>
+          <li><span class="check">✓</span> Watermark-free</li>
+          <li><span class="check">✓</span> 1080p video</li>
+          <li><span class="check">✓</span> Priority generation</li>
+          <li><span class="check">✓</span> All styles access</li>
+          <li class="no"><span class="check">✕</span> 4K / API access</li>
+        </ul>
+        <button class="btn-plan btn-pro" onclick="openModal('pro')">🚀 Pro Kinu — रु 799</button>
+      </div>
+
+      <!-- ELITE -->
+      <div class="plan-card elite">
+        <div class="plan-tier" style="color:#FCD34D">Elite 👑</div>
+        <div class="plan-price-row">
+          <span class="plan-currency">रु</span>
+          <span class="plan-amount" style="background:linear-gradient(135deg,#FCD34D,#F59E0B);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">1999</span>
+          <span class="plan-period">/mahina</span>
+        </div>
+        <div class="plan-tagline">Agencies ra professionals ko lagi</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><span class="check" style="color:#FCD34D">✓</span> Unlimited photos</li>
+          <li><span class="check" style="color:#FCD34D">✓</span> 4K ultra quality</li>
+          <li><span class="check" style="color:#FCD34D">✓</span> 5 min full video</li>
+          <li><span class="check" style="color:#FCD34D">✓</span> API access</li>
+          <li><span class="check" style="color:#FCD34D">✓</span> Commercial license</li>
+          <li><span class="check" style="color:#FCD34D">✓</span> Priority support</li>
+          <li><span class="check" style="color:#FCD34D">✓</span> Early features</li>
+          <li><span class="check" style="color:#FCD34D">✓</span> Bulk generation</li>
+        </ul>
+        <button class="btn-plan btn-elite" onclick="openModal('elite')">👑 Elite Kinu — रु 1999</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── FAQ ── -->
+  <div class="faq-section" id="faq">
+    <div class="section-title">Aaksar Sodincha</div>
+    <div class="section-sub">Kei prashna cha? Yahaa khojnus</div>
+
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Ksto photo generate garna milcha? <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">Realistic portrait, landscape, anime, 3D, painting, cinematic — jasto chahiyo testo style ma photo banaaucha. Nepali wa English duwai language ma prompt lekhna milcha.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Free plan ma kati photo generate garna milcha? <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">Free plan ma mahina ma <strong>5 photo credits</strong> milcha. Ek photo banauema 1 credit katincha. Credits sakiepachi next month ko lagi reset huncha wa Pro/Elite plan lina milcha.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Payment kasto tarika bata garna milcha? <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">eSewa, Khalti, ConnectIPS, debit/credit card, ra direct bank transfer bata payment garna milcha. Payment garnaasaath credit automatically add huncha.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Generate gareko photo/video ko copyright kasle huncha? <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">Tपाile generate gareko content tapai ko ho. Pro ra Elite plan ma commercial use pani garna milcha — portfolio, social media, client work sab ko lagi use garna milcha.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Plan cancel garna milcha? <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">Haina, knehi pani band garna milcha — no contract. Settings bata anytime cancel garna milcha. Cancel gareko mahina ko end samma access rahcha.</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-links">
+    <a href="#">Privacy Policy</a>
+    <a href="#">Terms of Service</a>
+    <a href="#">Contact Us</a>
+    <a href="#">API Docs</a>
+    <a href="#">Blog</a>
+  </div>
+  <p>© 2025 AiSirjana. Made with ❤️ in Nepal 🇳🇵</p>
+</footer>
+
+<!-- ═══════════════════════════════════════
+     PAYMENT MODAL
+════════════════════════════════════════ -->
+<div class="modal-overlay" id="payModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+
+    <h3 id="modalHeading">🚀 Pro Plan Kinu</h3>
+    <p class="modal-sub" id="modalSubText">200 credits/mahina + HD photo + 30 sec video banaaunus!</p>
+
+    <div class="modal-selected-plan">
+      <span class="msp-name" id="modalPlanName">Pro Plan</span>
+      <span class="msp-price" id="modalPlanPrice">रु 799/mahina</span>
+    </div>
+
+    <div class="form-group">
+      <label>Tapailko Naam</label>
+      <input type="text" class="modal-input" id="payName" placeholder="Ex: Ram Prasad Shrestha">
+    </div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" class="modal-input" id="payEmail" placeholder="tapai@email.com">
+    </div>
+    <div class="form-group">
+      <label>Phone Number</label>
+      <input type="tel" class="modal-input" id="payPhone" placeholder="98XXXXXXXX">
+    </div>
+
+    <div class="payment-label">PAYMENT METHOD CHHANNUS</div>
+    <div class="payment-methods">
+      <button class="pm-opt selected" onclick="selectPayment(this,'esewa')">
+        <span class="pm-icon">💚</span>
+        <span class="pm-name">eSewa</span>
+      </button>
+      <button class="pm-opt" onclick="selectPayment(this,'khalti')">
+        <span class="pm-icon">💜</span>
+        <span class="pm-name">Khalti</span>
+      </button>
+      <button class="pm-opt" onclick="selectPayment(this,'card')">
+        <span class="pm-icon">💳</span>
+        <span class="pm-name">Card</span>
+      </button>
+      <button class="pm-opt" onclick="selectPayment(this,'bank')">
+        <span class="pm-icon">🏦</span>
+        <span class="pm-name">Bank</span>
+      </button>
+    </div>
+
+    <button class="btn-pay-now" id="payNowBtn" onclick="processPayment()">
+      <div class="spinner" id="paySpinner"></div>
+      <span id="payBtnLabel">💳 रु 799 Pay Garnus</span>
+    </button>
+    <div class="secure-row">🔒 Secure SSL Payment — Tapailko data safe cha</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toastEl"></div>
+
+<!-- ═══════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════ -->
+<script>
+  // ── STATE ──
+  let credits = 3;
+  const MAX_CREDITS = 5;
+  let currentPlan = 'pro';
+  let selectedPayment = 'esewa';
+  let negPhotoOpen = false;
+  let currentTab = 'photo';
+
+  const PLANS = {
+    pro:   { name:'Pro Plan', price:'रु 799/mahina', credits:200, label:'🚀 Pro Plan Kinu', sub:'200 credits/mahina + HD photo + 30 sec video!' },
+    elite: { name:'Elite Plan 👑', price:'रु 1999/mahina', credits:9999, label:'👑 Elite Plan Kinu', sub:'Unlimited + 4K photo + 5 min video + API access!' }
+  };
+
+  const GALLERY_ITEMS = [
+    { emoji:'🏔️', label:'Everest Sunrise', bg:'linear-gradient(135deg,#1e3a5f,#2d6a4f)' },
+    { emoji:'🌸', label:'Pashupatinath Garden', bg:'linear-gradient(135deg,#4a1942,#c9184a)' },
+    { emoji:'🐯', label:'Royal Bengal Tiger', bg:'linear-gradient(135deg,#1b4332,#52b788)' },
+    { emoji:'🌆', label:'Kathmandu Night', bg:'linear-gradient(135deg,#03045e,#0077b6)' },
+    { emoji:'⚔️', label:'Ancient Warrior', bg:'linear-gradient(135deg,#3d1a78,#d4145a)' },
+    { emoji:'🌊', label:'Ocean at Sunset', bg:'linear-gradient(135deg,#023e8a,#48cae4)' },
+    { emoji:'🦁', label:'Lion Portrait', bg:'linear-gradient(135deg,#6b2737,#c9a84c)' },
+    { emoji:'🌌', label:'Milky Way Nepal', bg:'linear-gradient(135deg,#10002b,#3c096c)' },
+    { emoji:'🦋', label:'Butterfly Garden', bg:'linear-gradient(135deg,#134e4a,#0f766e)' },
+    { emoji:'🔥', label:'Fire Warrior', bg:'linear-gradient(135deg,#7c2d12,#ea580c)' },
+    { emoji:'🌺', label:'Rhododendron Field', bg:'linear-gradient(135deg,#500724,#be123c)' },
+    { emoji:'🐉', label:'Dragon Mountain', bg:'linear-gradient(135deg,#042f2e,#0f766e)' },
+  ];
+
+  const OUTPUT_EMOJIS = ['🖼️','🌄','🌸','🏔️','🌊','🦋','🐉','🌺','⚡','🌙','🔥','🎨','🦁','🌌'];
+  const OUTPUT_GRADIENTS = [
+    'linear-gradient(135deg,#1e1b4b,#4c1d95,#2d1b69)',
+    'linear-gradient(135deg,#0c1445,#1e3a8a,#1e1b4b)',
+    'linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)',
+    'linear-gradient(135deg,#3b0764,#6b21a8,#4c1d95)',
+    'linear-gradient(135deg,#1e3a2f,#065f46,#064e3b)',
+    'linear-gradient(135deg,#1c1917,#44403c,#292524)',
+  ];
+
+  // ── INIT ──
+  function init() {
+    buildGallery();
+    updateCreditsUI();
+  }
+
+  function buildGallery() {
+    const grid = document.getElementById('galleryGrid');
+    GALLERY_ITEMS.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'gallery-item';
+      el.innerHTML = `
+        <div class="gallery-bg" style="background:${item.bg}">${item.emoji}</div>
+        <div class="gallery-overlay"><span class="gallery-label">${item.label}</span></div>
+      `;
+      el.onclick = () => showToast('✨ ' + item.label + ' — Click garera download garnus!', 'info');
+      grid.appendChild(el);
+    });
+  }
+
+  function updateCreditsUI() {
+    const pct = Math.max(0, (credits / MAX_CREDITS) * 100);
+    document.getElementById('creditsProgress').style.width = pct + '%';
+    document.getElementById('creditCountLabel').textContent = credits + ' / ' + MAX_CREDITS + ' baaki';
+    document.getElementById('navCreditsNum').textContent = credits;
+  }
+
+  // ── TABS ──
+  function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById('tab-photo').classList.toggle('active', tab === 'photo');
+    document.getElementById('tab-video').classList.toggle('active', tab === 'video');
+    document.getElementById('photoSection').style.display = tab === 'photo' ? 'block' : 'none';
+    document.getElementById('videoSection').style.display = tab === 'video' ? 'block' : 'none';
+  }
+
+  // ── SUGGESTIONS ──
+  function setPrompt(type, text) {
+    document.getElementById(type + 'Prompt').value = text;
+    document.getElementById(type + 'Prompt').focus();
+  }
+
+  // ── NEG TOGGLE ──
+  function toggleNeg(type) {
+    negPhotoOpen = !negPhotoOpen;
+    document.getElementById(type + 'Neg').classList.toggle('show', negPhotoOpen);
+    document.getElementById('negToggleIcon').textContent = negPhotoOpen ? '▾' : '▸';
+  }
+
+  // ── GENERATE PHOTO ──
+  function generatePhoto() {
+    const prompt = document.getElementById('photoPrompt').value.trim();
+    if (!prompt) { showToast('⚠️ Pahile prompt lekhnus!', 'warning'); return; }
+    if (credits <= 0) { showToast('⚠️ Credits sakiyo! Plan upgrade garnus.', 'warning'); openModal('pro'); return; }
+
+    const btn = document.getElementById('photoGenBtn');
+    const spinner = document.getElementById('photoSpinner');
+    const btnTxt = document.getElementById('photoBtnTxt');
+
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    btnTxt.textContent = 'AI generate garda cha...';
+
+    const delay = 2000 + Math.random() * 1500;
+    setTimeout(() => {
+      credits--;
+      updateCreditsUI();
+
+      spinner.style.display = 'none';
+      btnTxt.textContent = '✨ Photo Banaau  •  1 Credit';
+      btn.disabled = false;
+
+      const emoji = OUTPUT_EMOJIS[Math.floor(Math.random() * OUTPUT_EMOJIS.length)];
+      const gradient = OUTPUT_GRADIENTS[Math.floor(Math.random() * OUTPUT_GRADIENTS.length)];
+      const quality = document.getElementById('photoQuality').value || 'standard';
+
+      document.getElementById('photoEmoji').textContent = emoji;
+      document.getElementById('photoCanvas').style.background = gradient;
+      document.getElementById('photoQualityBadge').textContent = quality === '4k' ? '4K Ultra' : quality === 'hd' ? 'HD' : 'Standard';
+
+      const out = document.getElementById('photoOutput');
+      out.classList.add('visible');
+      out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      showToast('✅ Photo tayaar bhayo! Download garnus.', 'success');
+
+      if (credits === 0) {
+        setTimeout(() => showToast('⚡ Credits sakiyo! Upgrade garnus.', 'warning'), 2500);
+      }
+    }, delay);
+  }
+
+  // ── GENERATE VIDEO ──
+  function generateVideo() {
+    const prompt = document.getElementById('videoPrompt').value.trim();
+    if (!prompt) { showToast('⚠️ Pahile prompt lekhnus!', 'warning'); return; }
+    if (credits < 3) { showToast('⚠️ Video ko lagi 3 credits chahincha! Upgrade garnus.', 'warning'); openModal('pro'); return; }
+
+    credits -= 3;
+    updateCreditsUI();
+    const out = document.getElementById('videoOutput');
+    out.classList.add('visible');
+    out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    showToast('🎬 3 sec preview tayaar! Full video ko lagi Pro upgrade garnus.', 'info');
+  }
+
+  // ── MODAL ──
+  function openModal(plan) {
+    currentPlan = plan;
+    const p = PLANS[plan];
+    document.getElementById('modalHeading').textContent = p.label;
+    document.getElementById('modalSubText').textContent = p.sub;
+    document.getElementById('modalPlanName').textContent = p.name;
+    document.getElementById('modalPlanPrice').textContent = p.price;
+    document.getElementById('payBtnLabel').textContent = '💳 ' + p.price.split('/')[0] + ' Pay Garnus';
+    document.getElementById('payModal').classList.add('open');
+    document.getElementById('payName').focus();
+  }
+
+  function closeModal() {
+    document.getElementById('payModal').classList.remove('open');
+  }
+
+  document.getElementById('payModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // ── PAYMENT METHOD ──
+  function selectPayment(btn, method) {
+    selectedPayment = method;
+    document.querySelectorAll('.pm-opt').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  }
+
+  // ── PROCESS PAYMENT ──
+  function processPayment() {
+    const name  = document.getElementById('payName').value.trim();
+    const email = document.getElementById('payEmail').value.trim();
+    const phone = document.getElementById('payPhone').value.trim();
+
+    if (!name)  { showToast('⚠️ Naam bharnus!', 'warning'); document.getElementById('payName').focus(); return; }
+    if (!email) { showToast('⚠️ Email bharnus!', 'warning'); document.getElementById('payEmail').focus(); return; }
+    if (!phone) { showToast('⚠️ Phone number bharnus!', 'warning'); document.getElementById('payPhone').focus(); return; }
+
+    const btn     = document.getElementById('payNowBtn');
+    const spinner = document.getElementById('paySpinner');
+    const label   = document.getElementById('payBtnLabel');
+
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    label.textContent = 'Processing...';
+
+    setTimeout(() => {
+      closeModal();
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      label.textContent = '💳 Pay Garnus';
+
+      credits = PLANS[currentPlan].credits;
+      const maxC = credits > 500 ? 9999 : credits;
+      document.getElementById('creditCountLabel').textContent = credits + ' credits added!';
+      document.getElementById('navCreditsNum').textContent = credits > 999 ? '∞' : credits;
+
+      showToast('🎉 Payment safal! ' + PLANS[currentPlan].name + ' activate bhayo!', 'success');
+
+      // Clear form
+      ['payName','payEmail','payPhone'].forEach(id => document.getElementById(id).value = '');
+    }, 2200);
+  }
+
+  // ── SCROLL ──
+  function scrollTo(selector) {
+    const el = document.querySelector(selector);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ── FAQ ──
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // ── TOAST ──
+  let toastTimer = null;
+  function showToast(msg, type = 'success') {
+    const el = document.getElementById('toastEl');
+    el.textContent = msg;
+    el.className = 'toast ' + type + ' show';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+  }
+
+  // ── START ──
+  init();
+</script>
+</body>
+</html>
