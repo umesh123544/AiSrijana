@@ -584,29 +584,7 @@
 
 <script>
 // ══════════════════════════════════════
-// STATE
-// ══════════════════════════════════════
-let credits = 5;
-const MAX_FREE = 5;
-let currentPlan = 'pro';
-let selPayment = 'esewa';
-let pollInterval = null;
-
-const PLANS = {
-  pro:   { head:'🚀 Pro Plan Activate Garnus', sub:'200 credits/mahina + HD photo + 30 sec video!', name:'Pro Plan', price:'रु 799/mahina', amount:'रु 799', credits:200 },
-  elite: { head:'👑 Elite Plan Activate Garnus', sub:'Unlimited + 4K photo + 5 min video + API!', name:'Elite Plan 👑', price:'रु 1999/mahina', amount:'रु 1999', credits:9999 },
-};
-
-// ══════════════════════════════════════
-// INIT
-// ══════════════════════════════════════
-(function init() {
-  buildGallery();
-  updateCreditsUI();
-})();
-
-// ══════════════════════════════════════
-// GALLERY
+// GALLERY DATA - पहिले define गरिएको
 // ══════════════════════════════════════
 const GALLERY = [
   { e:'🏔️', l:'Everest Sunrise', bg:'linear-gradient(135deg,#1e3a5f,#2d6a4f)' },
@@ -623,8 +601,47 @@ const GALLERY = [
   { e:'🐉', l:'Dragon Mountain', bg:'linear-gradient(135deg,#042f2e,#0f766e)' },
 ];
 
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+let credits = 5;
+const MAX_FREE = 5;
+let currentPlan = 'pro';
+let selPayment = 'esewa';
+let pollInterval = null;
+
+const PLANS = {
+  pro:   { head:'🚀 Pro Plan Activate Garnus', sub:'200 credits/mahina + HD photo + 30 sec video!', name:'Pro Plan', price:'रु 799/mahina', amount:'रु 799', credits:200 },
+  elite: { head:'👑 Elite Plan Activate Garnus', sub:'Unlimited + 4K photo + 5 min video + API!', name:'Elite Plan 👑', price:'रु 1999/mahina', amount:'रु 1999', credits:9999 },
+};
+
+// ══════════════════════════════════════
+// TOAST FUNCTION - सबैभन्दा पहिले define
+// ══════════════════════════════════════
+let toastTmr = null;
+function toast(msg, type = 'ok') {
+  const el = document.getElementById('toastEl');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'toast ' + type + ' show';
+  clearTimeout(toastTmr);
+  toastTmr = setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+(function init() {
+  buildGallery();
+  updateCreditsUI();
+})();
+
+// ══════════════════════════════════════
+// BUILD GALLERY
+// ══════════════════════════════════════
 function buildGallery() {
   const g = document.getElementById('galleryGrid');
+  if (!g) return;
   GALLERY.forEach(item => {
     const d = document.createElement('div');
     d.className = 'gitem';
@@ -924,7 +941,7 @@ async function doPayment() {
   spin.style.display = 'block';
   txt.textContent = 'Processing...';
 
-  // Simulate payment processing (in production, integrate eSewa/Khalti)
+  // Simulate payment processing
   await new Promise(r => setTimeout(r, 2000));
 
   closeModal();
@@ -951,15 +968,6 @@ function tFaq(btn) {
   const open = item.classList.contains('open');
   document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
   if (!open) item.classList.add('open');
-}
-
-let toastTmr = null;
-function toast(msg, type = 'ok') {
-  const el = document.getElementById('toastEl');
-  el.textContent = msg;
-  el.className = 'toast ' + type + ' show';
-  clearTimeout(toastTmr);
-  toastTmr = setTimeout(() => el.classList.remove('show'), 3500);
 }
 </script>
 </body>
