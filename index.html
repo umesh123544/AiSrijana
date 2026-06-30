@@ -278,7 +278,7 @@
     <button class="nav-link" onclick="scrollSec('faq')">FAQ</button>
   </div>
   <div class="nav-right">
-    <div class="credits-pill">⚡ <span id="navCred">3</span> Credits</div>
+    <div class="credits-pill">⚡ <span id="navCred">5</span> Credits</div>
     <button class="btn-upgrade-nav" onclick="openModal('pro')">🚀 Upgrade</button>
   </div>
 </nav>
@@ -312,9 +312,9 @@
     <div class="cred-info">
       <div class="cred-top">
         <span>⚡ Tapaiko Free Credits</span>
-        <small id="credLabel">3 / 5 baaki</small>
+        <small id="credLabel">5 / 5 baaki</small>
       </div>
-      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:60%"></div></div>
+      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:100%"></div></div>
       <p class="cred-note">Free ma <strong>5 photo</strong> generate garna milcha. Upgrade garnus → unlimited!</p>
     </div>
     <button class="btn-more" onclick="openModal('pro')">⚡ Credits Kinu</button>
@@ -586,12 +586,11 @@
 // ══════════════════════════════════════
 // STATE
 // ══════════════════════════════════════
-let credits = 3;
+let credits = 5;
 const MAX_FREE = 5;
 let currentPlan = 'pro';
 let selPayment = 'esewa';
 let pollInterval = null;
-let generatedImageUrl = null;
 
 const PLANS = {
   pro:   { head:'🚀 Pro Plan Activate Garnus', sub:'200 credits/mahina + HD photo + 30 sec video!', name:'Pro Plan', price:'रु 799/mahina', amount:'रु 799', credits:200 },
@@ -662,7 +661,7 @@ function sp(txt)  { document.getElementById('photoPrompt').value = txt; }
 function svp(txt) { document.getElementById('videoPrompt').value = txt; }
 
 // ══════════════════════════════════════
-// IMAGE GENERATION — Calls Netlify Function
+// IMAGE GENERATION
 // ══════════════════════════════════════
 async function generateImage() {
   const prompt = document.getElementById('photoPrompt').value.trim();
@@ -670,6 +669,7 @@ async function generateImage() {
   const style = document.getElementById('photoStyle').value;
   const size = document.getElementById('photoSize').value;
   const steps = parseInt(document.getElementById('photoSteps').value);
+  const quality = document.getElementById('photoQuality').value;
 
   if (!prompt) { toast('⚠️ Pahile prompt lekhnus!', 'warn'); return; }
   if (credits <= 0) { toast('⚠️ Credits sakiyo! Plan upgrade garnus.', 'warn'); openModal('pro'); return; }
@@ -688,11 +688,18 @@ async function generateImage() {
   const [w, h] = (size || '1024x1024').split('x').map(Number);
 
   try {
-    // ⚡ Netlify function call
     const res = await fetch('/api/generate-image', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, negative_prompt: negPrompt, style, width: w, height: h, steps }),
+      body: JSON.stringify({ 
+        prompt, 
+        negative_prompt: negPrompt, 
+        style, 
+        width: w, 
+        height: h, 
+        steps,
+        quality 
+      }),
     });
 
     const data = await res.json();
@@ -701,10 +708,8 @@ async function generateImage() {
       throw new Error(data.error || 'Image generate garna sakena.');
     }
 
-    // SUCCESS
     credits--;
     updateCreditsUI();
-    generatedImageUrl = data.image;
 
     showImageOutput(data.image);
     toast('✅ Photo tayaar bhayo! Download garnus.', 'ok');
@@ -744,7 +749,7 @@ function copyImgLink() {
 }
 
 // ══════════════════════════════════════
-// VIDEO GENERATION — Calls Netlify Function + Polls
+// VIDEO GENERATION
 // ══════════════════════════════════════
 async function generateVideo() {
   const prompt = document.getElementById('videoPrompt').value.trim();
@@ -780,7 +785,6 @@ async function generateVideo() {
       throw new Error(data.error || 'Video generation start garna sakena.');
     }
 
-    // Got prediction ID — poll for result
     credits -= 3;
     updateCreditsUI();
 
@@ -802,7 +806,7 @@ async function generateVideo() {
 
 function pollVideoStatus(predId) {
   let attempts = 0;
-  const maxAttempts = 60; // 5 minutes max
+  const maxAttempts = 60;
 
   clearInterval(pollInterval);
   pollInterval = setInterval(async () => {
@@ -840,14 +844,13 @@ function pollVideoStatus(predId) {
         resetVideoBtn();
 
       } else {
-        // Still processing
         logEl.textContent = `⏳ Status: ${data.status}\n${data.progress ? data.progress.slice(-200) : 'Processing...'}\n\nAttempt ${attempts}/${maxAttempts}`;
       }
 
     } catch (err) {
       console.error('Poll error:', err);
     }
-  }, 5000); // Poll every 5 seconds
+  }, 5000);
 }
 
 function showVideoOutput(videoUrl) {
@@ -894,7 +897,9 @@ function openModal(plan) {
 
 function closeModal() { document.getElementById('payModal').classList.remove('open'); }
 
-document.getElementById('payModal').addEventListener('click', e => { if (e.target === document.getElementById('payModal')) closeModal(); });
+document.getElementById('payModal').addEventListener('click', e => { 
+  if (e.target === document.getElementById('payModal')) closeModal(); 
+});
 
 function selPM(btn, pm) {
   selPayment = pm;
@@ -919,7 +924,7 @@ async function doPayment() {
   spin.style.display = 'block';
   txt.textContent = 'Processing...';
 
-  // TODO: eSewa/Khalti real payment API integrate garnus
+  // Simulate payment processing (in production, integrate eSewa/Khalti)
   await new Promise(r => setTimeout(r, 2000));
 
   closeModal();
@@ -937,7 +942,9 @@ async function doPayment() {
 // ══════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════
-function scrollSec(id) { document.getElementById(id)?.scrollIntoView({ behavior:'smooth', block:'start' }); }
+function scrollSec(id) { 
+  document.getElementById(id)?.scrollIntoView({ behavior:'smooth', block:'start' }); 
+}
 
 function tFaq(btn) {
   const item = btn.closest('.faq-item');
