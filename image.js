@@ -1,18 +1,24 @@
-// netlify/functions/generate-image.js
+// netlify/functions/generate-image/generate-image.js
 // Stability AI - Text to Image Generation
 
 exports.handler = async (event) => {
-  // Only allow POST
   if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: JSON.stringify({ error: "Method not allowed" }) };
+    return { 
+      statusCode: 405, 
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Method not allowed" }) 
+    };
   }
 
-  // CORS headers - sabai browser bata call garna milcha
   const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type",
     "Content-Type": "application/json",
   };
+
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 200, headers, body: "" };
+  }
 
   try {
     const body = JSON.parse(event.body || "{}");
@@ -23,7 +29,7 @@ exports.handler = async (event) => {
       width = 1024,
       height = 1024,
       steps = 30,
-      cfg_scale = 7,
+      quality = "standard",
     } = body;
 
     if (!prompt) {
@@ -34,13 +40,15 @@ exports.handler = async (event) => {
       };
     }
 
-    // Stability AI API Key — Netlify Environment Variable bata lincha
+    // Stability AI API Key
     const apiKey = process.env.STABILITY_API_KEY;
     if (!apiKey) {
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ error: "API key configure bhayeko chaina. Netlify dashboard ma STABILITY_API_KEY add garnus." }),
+        body: JSON.stringify({ 
+          error: "STABILITY_API_KEY configure bhayeko chaina. Netlify dashboard ma add garnus." 
+        }),
       };
     }
 
@@ -57,6 +65,9 @@ exports.handler = async (event) => {
     };
 
     const stylePreset = stylePresets[style] || "photographic";
+    
+    // HD quality ko lagi higher steps
+    const finalSteps = quality === 'hd' ? Math.max(steps, 40) : steps;
 
     // Stability AI SDXL API call
     const response = await fetch(
@@ -73,10 +84,10 @@ exports.handler = async (event) => {
             { text: prompt, weight: 1 },
             { text: negative_prompt, weight: -1 },
           ],
-          cfg_scale,
+          cfg_scale: 7,
           height,
           width,
-          steps,
+          steps: finalSteps,
           samples: 1,
           style_preset: stylePreset,
         }),
@@ -97,7 +108,6 @@ exports.handler = async (event) => {
 
     const data = await response.json();
 
-    // Base64 image return garchau
     const imageBase64 = data.artifacts?.[0]?.base64;
     if (!imageBase64) {
       return {
