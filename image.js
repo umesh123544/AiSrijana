@@ -1,6 +1,4 @@
-// netlify/functions/generate-image/generate-image.js
 // Stability AI - Text to Image Generation
-
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { 
@@ -40,7 +38,6 @@ exports.handler = async (event) => {
       };
     }
 
-    // Stability AI API Key
     const apiKey = process.env.STABILITY_API_KEY;
     if (!apiKey) {
       return {
@@ -52,7 +49,6 @@ exports.handler = async (event) => {
       };
     }
 
-    // Style preset mapping
     const stylePresets = {
       "Realistic (Saccho jasto)": "photographic",
       "Anime / Cartoon": "anime",
@@ -65,11 +61,8 @@ exports.handler = async (event) => {
     };
 
     const stylePreset = stylePresets[style] || "photographic";
-    
-    // HD quality ko lagi higher steps
     const finalSteps = quality === 'hd' ? Math.max(steps, 40) : steps;
 
-    // Stability AI SDXL API call
     const response = await fetch(
       "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image",
       {
@@ -107,8 +100,8 @@ exports.handler = async (event) => {
     }
 
     const data = await response.json();
-
     const imageBase64 = data.artifacts?.[0]?.base64;
+
     if (!imageBase64) {
       return {
         statusCode: 500,
